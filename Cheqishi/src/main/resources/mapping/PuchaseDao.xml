@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdqn.dao.PuchaseDao">
+	<resultMap type="Puchase" id="PuchaseMap">
+		<id column="purchaseId" property="purchaseId" /><!-- 主键 -->
+		<result column="purchaseName" property="purchaseName" />
+		<result column="purchaseUnit" property="purchaseUnit" />
+		<result column="purchaseNumber" property="purchaseNumber" />
+		<result column="purchaseTotalsum" property="purchaseTotalsum" />
+		<result column="purchaseDate" property="purchaseDate" />
+		<result column="purchaseQuality" property="purchaseQuality" />
+		<result column="datetimeState" property="datetimeState" />
+		<result column="remark" property="remark" />
+		<association property="supplier" column="supplierId"
+			select="com.bdqn.dao.SupplierDao.FindId">
+
+		</association>
+	</resultMap>
+
+	<!-- 采购配件 -->
+	<insert id="AddPuchase" parameterType="Puchase">
+		insert into puchase
+		values(null,#{supplier.supplierId},#{purchaseName},#{purchaseUnit},#{purchaseNumber},#{purchaseTotalsum},
+		#{purchaseDate},#{purchaseQuality},default,#{remark})
+	</insert>
+
+	<!-- 修改配件信息 -->
+	<update id="ModifyPuchase" parameterType="Puchase">
+		update puchase
+		<set>
+			<if test="supplier!=null">
+				supplierId=#{supplier.supplierId},
+			</if>
+			<if test="purchaseName!=null">
+				purchaseName=#{purchaseName},
+			</if>
+			<if test="purchaseUnit!=0">
+				purchaseUnit=#{purchaseUnit},
+			</if>
+			<if test="purchaseNumber!=0">
+				purchaseNumber=#{purchaseNumber},
+			</if>
+			<if test="purchaseTotalsum!=0">
+				purchaseTotalsum=#{purchaseTotalsum},
+			</if>
+			<if test="purchaseDate!=null">
+				purchaseDate=#{purchaseDate},
+			</if>
+			<if test="purchaseQuality!=null">
+				purchaseQuality=#{purchaseQuality},
+			</if>
+			<if test="datetimeState!=null">
+				datetimeState=#{datetimeState},
+			</if>
+			<if test="remark!=null">
+				remark=#{remark}
+			</if>
+		</set>
+		where purchaseId=#{purchaseId}
+	</update>
+
+	<!-- 分页查询 -->
+	<select id="PageQuery" parameterType="map"
+		resultMap="PuchaseMap">
+		select * from puchase
+		<where>
+			<if test="supplierId!=null">
+				supplierId=#{supplierId}
+			</if>
+			<if test="startDate!=null"> 
+			 	and purchaseDate between #{startDate} and #{endDate} 
+			</if> 
+		</where>
+		limit #{pageIndex},#{pageSize}
+	</select>
+
+	<!-- 查询总记录数 -->
+	<select id="Count" parameterType="map" resultType="int">
+		select count(1) from puchase
+		<where>
+			<if test="supplierId!=null">
+				supplierId=#{supplierId}
+			</if>
+			<if test="startDate!=null"> 
+			 	and purchaseDate between #{startDate} and #{endDate} 
+			</if>
+		</where>
+	</select>
+	
+	<!-- 查询要修改的信息 -->
+	<select id="FindPuchase" parameterType="int" resultMap="PuchaseMap">
+		select * from puchase where purchaseId=#{id}
+	</select>
+</mapper>
